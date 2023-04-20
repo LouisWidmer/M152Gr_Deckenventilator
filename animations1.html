@@ -2,6 +2,7 @@
 
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta charset="UTF-8">
 <style> 
 .keyframe {
   width: 140px;
@@ -34,13 +35,47 @@
   text-align: center;
   color: lightblue;
 }
+canvas {
+	background-color: plum;
+}
+svg { 
+  display: block; 
+  margin: 0 auto;
+  width: 60%;
+}
+#orbits circle {
+  fill: none;
+  stroke: #000000;
+  stroke-width: 3px;
+}
+#lineGroup line {
+  stroke-width: 1px;
+}
+#earth {
+  fill: royalblue;
+}
+#venus {
+  fill: rgb(216, 206, 165);
+}
+#sol {
+  fill: yellow;
+}
 </style>
 		<link rel="stylesheet" href="assets/css/main.css" />
 
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-
+		<title>Animationen Part 1</title>
 	</head>
+<header>
+	<h1><strong>Animation Part 1</strong></h1>
+	  <ul class="actions special">
+										<li><a href="index.html" class="button primary">Startseite</a></li>
+										<li><a href="quellen.html" class="button primary">Quellen</a></li>
+										<li><a href="impressum.html" class="button primary">Impressum</a></li>
+										<li><a href="animations2.html" class="button primary">Animationen Part 2</a></li>
 
+									</ul>
+</header>
 	<body>
 	<div id="main">
 	<h3>Keyframes</h3>
@@ -50,18 +85,103 @@
 	<h3>GIF</h3>
 	<img src="/images/roundroundroundround.gif"></img>
 	<h3>SVG</h3>
-	<svg width="250" height="250">
-  	<circle cx="100" cy="100" r="75"
-  	stroke="royalblue" stroke-width="10" fill="blueviolet" />
-	</svg>	
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500">
+      <g id="orbits">
+        <circle id="venusorbit" cx="250" cy="250" r="120" />
+        <circle id="earthorbit" cx="250" cy="250" r="165" />
+    </g>
+      <g id="lineGroup" transform="rotate(-90 250 250)"></g>
+  <circle id="earth" cx="250" cy="85" r="16" />
+  <circle id="venus" cx="250" cy="130" r="14" />
+  <circle id="sol" cx="250" cy="250" r="50" />
+</svg>
+<script>
+	const earthDeg = 5,
+earthOrbits = 8,
+venusOrbits = 13,
+resonance = earthOrbits / venusOrbits,
+centre = 250,
+earthDist = centre - parseInt(earth.getAttribute("cy"), 10),
+venusDist = centre - parseInt(venus.getAttribute("cy"), 10);
+let i = 0,
+orbitals = setInterval(function(){
+  earth.setAttribute("transform", "rotate("+ i + " " + centre + " " + centre + ")");
+   venus.setAttribute("transform", "rotate("+ i / resonance + " " + centre + " " + centre + ")");
+  let earthX = Math.cos((i*Math.PI/180)) * earthDist + centre,
+  earthY = Math.sin((i*Math.PI/180)) * earthDist + centre;
+  venusX = Math.cos((i/(earthOrbits/13))*Math.PI/180) * venusDist + centre,
+  venusY = Math.sin((i/(earthOrbits/13))*Math.PI/180) * venusDist + centre,
+  resLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  resLine.setAttribute('x1', earthX);
+  resLine.setAttribute('y1', earthY);
+  resLine.setAttribute('x2', venusX);
+  resLine.setAttribute('y2', venusY);
+  resLine.setAttribute('stroke', 'hsla(' + i + ', 50%, 50%, 0.5)');
+  lineGroup.appendChild(resLine);   
+  i += earthDeg;
+  if (i == (360 * earthOrbits) + earthDeg) {
+    clearInterval(orbitals);
+   }
+}, 60);
+</script>
 	<h3>Canvas</h3>
-	<canvas id="myCanvas" width="300" height="300" style="border:2.5px solid  blueviolet;"></canvas>
+	<canvas id="canvas" width="500" height="250">Beispiel fuer eine Animation mit Canvas.</canvas>
 		<script>
-		var c = document.getElementById("myCanvas");
-		var ctx = c.getContext("2d");
-		ctx.beginPath();
-		ctx.arc(100,100,75,0,2*Math.PI);
-		ctx.stroke();
+		'use strict';
+document.addEventListener("DOMContentLoaded", function () {
+	let canvas = document.getElementById('canvas'),
+		x = 120,
+		y = 10,
+		q = 40,
+		yMax = canvas.clientHeight - q,
+		xMax = canvas.clientWidth - q,
+		speed = xMax / 1500,
+		lastTimestamp = -1;
+
+	function animate(timestamp) {
+		// Ab dem zweiten Aufruf beginnt die Animation, beim ersten Aufruf
+		// wird an der Startposition gezeichnet.
+		if (lastTimestamp > 0) {
+			// Neue X-Position berechnen
+			let delta_x = (timestamp - lastTimestamp) * speed;
+			x += delta_x;
+			// Gültigen X-Bereich verlassen? Wenden
+			if (x < 0) {
+				reverse(0);
+			} else if (x > xMax) {
+				reverse(xMax);
+			}
+		}
+		// Quadrat an der neuen Position zeichnen
+		draw(x, y, q);
+		// Zeitpunkt merken um im nächsten Schritt die Zeitdifferenz zu bestimmen
+		lastTimestamp = timestamp;
+		// Aufruf für den nächsten Animationsframe registrieren
+		requestAnimationFrame(animate);
+	}
+
+	function reverse(mirrorX) {
+		// Siehe Erklärung im Artikel
+		x = 2 * mirrorX - x;
+		// Vorzeichen der Geschwindigkeit drehen: Kehrt marsch!
+		speed = -speed;
+		if (y < 190){
+			y = y+20;
+		}
+	}
+
+	function draw(squareX, squareY, squareSize) {
+		let context = canvas.getContext('2d');
+		context.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+		context.fillStyle = '#dfac20';
+		context.fillRect(x, y, squareSize, squareSize);
+		context.lineWidth = 3;
+		context.strokeStyle = '#3983ab';
+		context.strokeRect(x, y, squareSize, squareSize);
+	}
+
+	requestAnimationFrame(animate);
+});
 		</script> 
 	</body>
 	</div>
