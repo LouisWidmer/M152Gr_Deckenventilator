@@ -2,9 +2,13 @@
 @import 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400';
 
 /*
+
 	Stellar by HTML5 UP
+
 	html5up.net | @ajlkn
+
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+
 */
 
 html, body, div, span, applet, object,
@@ -35,6 +39,7 @@ body {
 
 ol, ul {
 	list-style: none;
+	text-align: center
 }
 
 blockquote, q {
@@ -80,6 +85,7 @@ input, select, textarea {
 
 	body {
 		-ms-overflow-style: scrollbar;
+
 	}
 
 	@media screen and (max-width: 480px) {
@@ -3783,3 +3789,4 @@ input, select, textarea {
 			}
 
 		}
+/* Selbsterstellte Klassen */
